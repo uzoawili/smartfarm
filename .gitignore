@@ -1,0 +1,35 @@
+# IntelliJ project files
+.idea
+out
+gen
+
+# ***** Python template ******
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+
+# Django stuff:
+*.log
+local_settings.py
+
+# virtualenv
+venv/
+ENV/
+
+#dot-env
+.env
+
+# staticfiles
+staticfiles/
