@@ -1,0 +1,11 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Station{% endblock title %}
+
+{% block main %}
+  <h1>Smartfarm - Station</h1>
+  <div>
+    <a href="{% url 'dashboard:logout' %}" class="">Log Out</a>
+  </div>
+{% endblock main %}

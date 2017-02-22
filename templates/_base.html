@@ -1,0 +1,29 @@
+{% load static %}
+
+<html>
+    <head>
+        <title>{% block title %}{% endblock title %} - Smartfarm - IOT Smart Irrigation System
+</title>
+        <meta  name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+        {% block styles %}
+            <!-- Latest compiled and minified CSS -->
+            <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i"
+                  rel="stylesheet">
+            <link type="text/css" rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+            {% block extra_styles %}{% endblock extra_styles %}
+        {% endblock styles %}
+    </head>
+
+    <link>
+
+    <body>
+        {% block main %}
+
+        {% endblock main %}
+
+        {% block scripts %}
+             {% block extra_scripts %}{% endblock extra_scripts %}
+        {% endblock scripts %}
+    </body>
+</html>
