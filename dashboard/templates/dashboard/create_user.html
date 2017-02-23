@@ -3,9 +3,7 @@
 
 {% block title %}Create User{% endblock title %}
 
-{% block main %}
-  <h1>Smartfarm - Create User</h1>
-
+{% block card_content %}
   <form method="POST" action="">
     {% csrf_token %}
     {% for field in form %}
@@ -21,4 +19,4 @@
       <button class="btn btn-primary" type="submit">Create User</button>
     </div>
   </form>
-{% endblock main %}
+{% endblock card_content %}

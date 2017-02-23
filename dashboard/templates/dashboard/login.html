@@ -3,9 +3,9 @@
 
 {% block title %}Login{% endblock title %}
 
-{% block main %}
-  <h1>Smartfarm - Login</h1>
-
+{% block card_title %}Login{% endblock %}
+{% block card_subtitle %}{% endblock %}
+{% block card_content %}
   <form method="POST" action="">
     {% csrf_token %}
     {% for field in form %}
@@ -23,4 +23,4 @@
       <button class="btn btn-primary" type="submit">Log In</button>
     </div>
   </form>
-{% endblock main %}
+{% endblock card_content %}
