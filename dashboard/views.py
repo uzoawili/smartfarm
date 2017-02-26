@@ -3,9 +3,17 @@ from django.views.generic import View
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
 
 from .models import Station
 from .forms import StationForm
+
+
+class LoginRequiredMixin(object):
+    @classmethod
+    def as_view(cls, **kwargs):
+        view = super(LoginRequiredMixin, cls).as_view(**kwargs)
+        return login_required(view)
 
 class IndexView(View):
 
@@ -68,7 +76,7 @@ class LoginView(View):
         return render(request, 'dashboard/login.html', {'form': form})
 
 
-class StationsView(View):
+class StationsView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         stations = Station.objects.all()
@@ -78,7 +86,7 @@ class StationsView(View):
         return render(request, 'dashboard/stations.html', context)
 
 
-class StationSetupView(View):
+class StationSetupView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         return render(request, 'dashboard/station_settings.html', {'form': StationForm()})
@@ -97,7 +105,7 @@ class StationSetupView(View):
         return render(request, 'dashboard/station_settings.html', {'form': form})
 
 
-class StationSettingsView(View):
+class StationSettingsView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         station = get_object_or_404(Station, pk=kwargs.get('pk'))

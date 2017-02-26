@@ -1,10 +1,14 @@
 body, html {
+    font-family: 'Lato', sans-serif;
     font-size: 12px;
     color: #333333;
 }
 
+a {
+    text-decoration: none;
+}
 
-/* text styles */
+/* header and text styles */
 
 .large-header {
     font-size: 3rem;
@@ -12,9 +16,221 @@ body, html {
 }
 .medium-header {
     font-size: 1.67rem;
-    font-weight: 500;
+    font-weight: 700;
     letter-spacing: 0;
 }
+.small-header {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+
+/* forms & input fields */
+
+.form {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+}
+.form .form-cta {
+    padding-top: 48px;
+}
+.form .errorlist, .input-field .errorlist {
+    color: #db7093;
+    padding-left: 0;
+    list-style-type: none;
+}
+.form .form-cta, .form .input-field {
+    width: 100%;
+}
+.input-field {
+    margin-top: 24px;
+}
+.input-field.inline {
+    display: inline-block;
+    width: unset;
+    flex-grow: 1;
+}
+.input-field.inline + .input-field.inline {
+    margin-left: 24px;
+}
+.input-field label, .input-field input {
+    display: block;
+    outline: none;
+}
+.input-field input[type='checkbox'] {
+    display: inline-block;
+}
+.input-field label {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.input-field input[type='text'],
+.input-field input[type='number'],
+.input-field input[type='email'],
+.input-field input[type='password'],
+.input-field textarea,
+.input-field select {
+    width: 100%;
+    padding: 17px;
+    margin-top: 8px;
+    background-color: #EEEEEE;
+    border: 1px solid #DDDDDD;
+    border-radius: 0;
+    font-family: 'Lato', sans-serif;
+    font-size: 1.67rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    transition: 0.3s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+}
+.input-field input[type='text']:focus,
+.input-field input[type='number']:focus,
+.input-field input[type='email']:focus,
+.input-field input[type='password']:focus,
+.input-field textarea:focus,
+.input-field select:focus {
+    border-color: #529C00;
+}
+
+
+/* buttons */
+
+.btn {
+    display: block;
+    outline: none;
+    padding: 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.3s;
+    cursor: pointer;
+}
+.btn-primary {
+    width: 100%;
+    color: #ffffff;
+    background-color: #529C00;
+    border: none;
+    border-radius: 5px;
+}
+.btn-primary:hover {
+    background-color: #73AE33;
+}
+.btn-primary:active, .btn-primary:focus {
+    background-color: #529C00;
+}
+.btn-option {
+    padding: 20px;
+    color: #333333;
+    background-color: transparent;
+    border: none;
+}
+.btn-option:hover {
+    color: #73AE33;
+}
+.btn-option:active, .btn-option:focus {
+    color: #529C00;
+}
+
+.btn-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #333333;
+    background-color: transparent;
+    border: none;
+}
+.btn-toggle:hover {
+    color: #73AE33;
+}
+.btn-toggle:active, .btn-toggle:focus {
+    color: #529C00;
+}
+.btn-toggle .toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 20px;
+    border: none;
+    border-radius: 10px;
+    background-color: #DDDDDD;
+    box-shadow: inset 0 0 30px rgba(34, 36, 38, 0.1);
+    transition: background-color 0.2s;
+}
+.btn-toggle .toggle-switch:after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 10px 3px rgba(34, 36, 38, 0.1);
+    transition: left 0.2s ease-out;
+}
+.btn-toggle.on .toggle-switch {
+    background-color: #73AE33;
+}
+.btn-toggle.on .toggle-switch:after {
+    left: calc(100% - 20px);
+}
+.btn-toggle .caption {
+    margin-left: 10px;
+}
+.btn-cancel {
+    flex-grow: 1;
+}
+
+/* tabs */
+
+.tabs {
+    display: flex;
+    list-style: outside none;
+    margin: 0;
+    padding: 0 0 5px;
+}
+.tabs > .tab {
+    position: relative;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    flex-grow: 1;
+    padding: 5px 0 10px;
+}
+.tabs > .tab:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 5px;
+    left: 0;
+    bottom: 0;
+    background-color: #DDDDDD;
+    pointer-events: none;
+    transition: 0.3s;
+}
+.tabs > .tab.active:after {
+    background-color: #333333;
+}
+
+.tabs > .tab:not(.active):hover,
+.tabs > .tab:not(.active):focus {
+    color: #529C00;
+    cursor: pointer;
+}
+
 
 
 /* page */
@@ -23,8 +239,18 @@ body, html {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-top: 50px;
 }
 
+
+/* fixed-menu */
+
+.fixed-menu {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
 
 /* Brand Header */
 
@@ -32,11 +258,11 @@ body, html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 6.25rem;
+    text-align: center;
 }
 .brand-header .logo {
-    width: 37px;
     height: 50px;
+    margin-bottom: 5px;
 }
 .brand-header .name {
     margin: 0;
@@ -44,53 +270,196 @@ body, html {
 .brand-header .motto {
     font-size: 1rem;
     font-weight: 700;
-    text-transform: uppercase;
     letter-spacing: 3px;
     color: #999999;
+    text-transform: uppercase;
 }
 
 
 /* card */
 
 .card {
-    width: 90%;
+    width: 100%;
     max-width: 400px;
-    margin: 50px 0;
+    min-width: 330px;
+    margin: 50px 20px 80px;
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 50px 10px rgba(34, 36, 38, 0.1);
 }
-.card .header {
+.card > .header {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: white;
     background: #333333;
-    padding: 30px;
+    padding: 25px;
 }
-.card .header .title, .card .header .subtitle {
+.card > .header .title {
     margin: 0;
 }
+.card > .header .subtitle {
+    margin: 0 0 10px;
+    font-weight: 500;
+}
+.card > .content {
+    padding: 0 30px;
+    margin: 30px 0;
+}
+.card > .footer {
+    border-top: 1px solid #DDDDDD;
+    margin: 0 30px;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 
+/* page-footer */
 
-/* footer */
-
-.footer {
+.page-footer {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     font-size: 1rem;
+    margin-bottom: 50px;
 }
-.footer .credits {
+.page-footer .credits {
     font-size: 1rem;
     font-weight: 700;
-    text-transform: uppercase;
     letter-spacing: 3px;
+    text-transform: uppercase;
 }
-.footer .reference {
+.page-footer .reference {
     color: #529C00;
+}
+
+
+/* stations */
+.stations {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+/* station controls */
+
+.station-controls {
+    display: flex;
+    padding: 50px 0;
+    border-top: 1px solid #DDDDDD;
+}
+.station-controls:first-child {
+    margin-top: -30px;
+    border-top: none;
+}
+.station-controls:last-child {
+    margin-bottom: -30px;
+}
+.station-controls .indicator-graphic {
+    position: relative;
+    margin: 0 30px 0 20px;
+    width: 95px;
+    height: 95px;
+    flex: none;
+}
+.station-controls .indicator-graphic .content {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 30px 8px rgba(34, 36, 38, 0.1);
+}
+.station-controls .indicator-graphic .content .icon {
+    width: 30px;
+}
+.station-controls .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
+    flex-grow: 1;
+}
+.station-controls .controls .title {
+    width: 100%;
+    font-size: 1.67rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    margin: 0;
+}
+.station-controls .controls .value {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+.station-controls .controls .value,
+.station-controls .controls .sprinkler-switch {
+    align-self: center;
+}
+.controls .sprinkler-switch {
+    padding: 5px 20px;
+}
+.station-controls .controls .details {
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+.station-controls .mode-selector {
+    width: 100%;
+    max-width: 160px;
+    margin-bottom: -15px;
+}
+.station-controls .mode-selector .tab:last-child{
+    text-align: right;
+}
+
+
+/* sprinkler sonarWave effect */
+
+@keyframes sonarWave {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+.sprinkler .indicator-graphic .effect {
+    background-color: #48A4FF;
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.sprinkler .indicator-graphic .effect.on {
+    animation: sonarWave 3s linear infinite;
+}
+
+
+/* sensor humidity pie chart effect */
+
+.sensor .indicator-graphic .effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: #FFFFFF;
+    stroke: #48A4FF;
+    transform: rotate(-90deg);
+    stroke-width: 13px;
+    stroke-dasharray: 0 300;
+    transition: 0.5s;
 }

@@ -3,24 +3,31 @@
 
 {% block title %}Login{% endblock title %}
 
-{% block card_title %}Login{% endblock %}
-{% block card_subtitle %}{% endblock %}
+{% block card_title %}Log In{% endblock %}
+{% block card_subtitle_block %}{% endblock %}
 {% block card_content %}
-  <form method="POST" action="">
+
+  <form class="form" method="POST" action="">
     {% csrf_token %}
     {% for field in form %}
       <div class="input-field">
         <label for="{{ field.id_for_label }}">
-          {{ field.label }}
+          {{ field.label }}{% if field.field.required %} *{% endif %}
         </label>
         {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}
+          <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
       </div>
     {% endfor %}
     {% if form.non_field_errors %}
-      <p class="form-error">{{ form.non_field_errors }}</p>
+      {{ form.non_field_errors }}
     {% endif %}
     <div class="form-cta">
       <button class="btn btn-primary" type="submit">Log In</button>
     </div>
   </form>
+
 {% endblock card_content %}
+{% block card_footer %}{% endblock %}

@@ -3,20 +3,28 @@
 
 {% block title %}Create User{% endblock title %}
 
+{% block card_title %}Create User{% endblock %}
+{% block card_subtitle_block %}{% endblock %}
 {% block card_content %}
-  <form method="POST" action="">
+
+  <form class="form" method="POST" action="">
     {% csrf_token %}
     {% for field in form %}
       <div class="input-field">
         <label for="{{ field.id_for_label }}">
-          {{ field.label }}
+          {{ field.label }}{% if field.field.required %} *{% endif %}
         </label>
         {{ field }}
-        {% if field.errors %}{{ field.errors }}{% endif %}
+        {{ field.errors }}
+        {% if field.help_text %}
+          <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
       </div>
     {% endfor %}
     <div class="form-cta">
       <button class="btn btn-primary" type="submit">Create User</button>
     </div>
   </form>
+
 {% endblock card_content %}
+{% block card_footer %}{% endblock %}

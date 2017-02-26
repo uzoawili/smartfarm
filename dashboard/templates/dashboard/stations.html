@@ -1,27 +1,32 @@
 {% extends '_base.html' %}
 {% load static %}
 
-{% block title %}Station{% endblock title %}
+{% block title %}Stations{% endblock title %}
 
 {% block main %}
+  <div class="stations">
   {% for station in stations %}
     <div class="card">
 
       <div class="header">
-        <h2 class="title">Station</h2>
-        <h3 class="subtitle">{{ station.name }}</h3>
+        <h4 class="subtitle small-header">Station</h4>
+        <h2 class="title medium-header">{{ station.name }}</h2>
       </div>
 
       <div class="content">
-
-        <div class="section sensor-controls">
-          <div class="graphic">
-            <svg class="icon"><use xlink:href="#icon-humidity"></use></svg>
+        <div class="station-controls sensor">
+          <div class="indicator-graphic">
+            <svg  class="effect" style="stroke-dasharray: {{ station.get_current_humidity_angle }} 300;'">
+              <circle r="50%" cx="50%" cy="50%"></circle>
+            </svg>
+            <div class="content">
+              <img class="icon" src="{% static 'img/drop.svg' %}">
+            </div>
           </div>
           <div class="controls">
             <h3 class="title">Soil Humidity</h3>
             <span class="value">
-              {% if station.current_humidity %}
+              {% if station.is_active and station.current_humidity %}
                 {{ station.current_humidity }}%
               {% else %}
                 ---
@@ -31,31 +36,40 @@
           </div>
         </div>
 
-        <div class="section sprinkler-controls">
-          <div class="graphic">
-            <svg class="icon"><use xlink:href="#icon-sprinkler"></use></svg>
+        <div class="station-controls sprinkler">
+          <div class="indicator-graphic">
+            <div class="effect {{ station.sprinkler_status }}"></div>
+            <div class="content">
+              <img class="icon" src="{% static 'img/tap.svg' %}">
+            </div>
           </div>
           <div class="controls">
             <h3 class="title">Sprinkler</h3>
-            <span class="value">{{ station.sprinkler_status }}%</span>
+            <span class="value">{{ station.sprinkler_status }}</span>
+            {% if station.sprinkler_mode == station.SPRINKLER_MANUAL %}
+              <a class="btn btn-toggle sprinkler-switch {{ station.sprinkler_status }}">
+                <span class="toggle-switch"></span>
+              </a>
+            {% endif %}
             <span class="details">
-              <ul class="mode-selector-tabs">
+              <ul class="mode-selector tabs">
                 {% for mode in station.SPRINKLER_MODES %}
-                  <li class="mode-tab" data-mode-value="{{ mode.0 }}">{{ mode.1 }}</li>
+                  <li class="tab{% if mode.0 == station.sprinkler_mode %} active{% endif %}" data-value="{{ mode.0 }}">
+                    {{ mode.1 }}
+                  </li>
                 {% endfor %}
               </ul>
             </span>
           </div>
         </div>
+      </div>
 
-        <div class="options">
-          <button class="btn btn-toggle{% if station.is_active %} active{% endif %}">
-            <span class="toggle-switch"></span>
-            <span class="caption">{% if station.is_active %}Active{% else %}Inactive{% endif %}</span>
-          </button>
-          <a class="btn btn-option" href="{% url 'dashboard:station_settings' pk=station.pk %}">Settings</a>
-        </div>
-
+      <div class="footer">
+        <a class="btn btn-toggle{% if station.is_active %} on{% endif %}">
+          <span class="toggle-switch"></span>
+          <span class="caption">{% if station.is_active %}Active{% else %}Inactive{% endif %}</span>
+        </a>
+        <a class="btn btn-option" href="{% url 'dashboard:station_settings' pk=station.pk %}">Settings</a>
       </div>
 
     </div>
@@ -67,5 +81,5 @@
       <a class="btn btn-primary" href="{% url 'dashboard:station_setup' %}">Setup Station</a>
     </div>
   {% endfor %}
-
+  </div>
 {% endblock main %}
