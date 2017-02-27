@@ -171,9 +171,10 @@ a {
 .btn-toggle .toggle-switch:after {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
-    left: 0;
+    width: 16px;
+    height: 16px;
+    left: 2px;
+    top: 2px;
     border: none;
     border-radius: 50%;
     background-color: #FFFFFF;
@@ -184,7 +185,7 @@ a {
     background-color: #73AE33;
 }
 .btn-toggle.on .toggle-switch:after {
-    left: calc(100% - 20px);
+    left: calc(100% - 16px - 2px);
 }
 .btn-toggle .caption {
     margin-left: 10px;
