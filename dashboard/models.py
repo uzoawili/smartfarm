@@ -44,6 +44,7 @@ class Station(models.Model):
         SPRINKLER_ON: 1,
         SPRINKLER_OFF: 0,
     }
+    MAX_HUMIDITY_ANGLE = 300;
 
     # station settings fields
     name = models.CharField(max_length=255, verbose_name='Station Name')
@@ -59,14 +60,22 @@ class Station(models.Model):
 
     # station status fields
     is_active = models.BooleanField(default=False)
-    current_humidity = models.SmallIntegerField(blank=True, null=True)
+    current_humidity = models.SmallIntegerField(null=True, default=None)
     sprinkler_mode = models.CharField(choices=SPRINKLER_MODES, default=SPRINKLER_AUTO, max_length=255)
     sprinkler_status = models.CharField(choices=SPRINKLER_STATUSES, default=SPRINKLER_OFF, max_length=255)
 
     def get_binary_sprinkler_status(self):
         return self.SPRINKLER_STATUS_BINARY_MAP[self.sprinkler_status]
 
-    def get_current_humidity_angle(self, circumference=300):
+    def get_current_humidity_angle(self):
         if self.is_active and self.current_humidity is not None:
-            return ((self.current_humidity / 100) * circumference)
+            return (self.current_humidity / 100) * self.MAX_HUMIDITY_ANGLE
         return 0
+
+    def getState(self):
+        return {
+            'is_active': self.is_active,
+            'current_humidity': self.current_humidity,
+            'sprinkler_mode': self.sprinkler_mode,
+            'sprinkler_status': self.sprinkler_status,
+        }

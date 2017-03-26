@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseBadRequest
 
 from .models import Station
-from .forms import StationForm
+from .forms import StationSettingsForm, StationStateForm
 
 
 class LoginRequiredMixin(object):
@@ -89,13 +90,13 @@ class StationsView(LoginRequiredMixin, View):
 class StationSetupView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        return render(request, 'dashboard/station_settings.html', {'form': StationForm()})
+        return render(request, 'dashboard/station_settings.html', {'form': StationSettingsForm()})
 
     def post(self, request, *args, **kwargs):
         """
         Handles the create user form submission
         """
-        form = StationForm(request.POST)
+        form = StationSettingsForm(request.POST)
         if form.is_valid():
             # Save the form to add the station to db
             form.save()
@@ -109,7 +110,7 @@ class StationSettingsView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         station = get_object_or_404(Station, pk=kwargs.get('pk'))
-        context = {'form': StationForm(instance=station)}
+        context = {'form': StationSettingsForm(instance=station)}
         return render(request, 'dashboard/station_settings.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -117,7 +118,7 @@ class StationSettingsView(LoginRequiredMixin, View):
         Handles the create user form submission
         """
         station = get_object_or_404(Station, pk=kwargs.get('pk'))
-        form = StationForm(request.POST, instance=station)
+        form = StationSettingsForm(request.POST, instance=station)
         if form.is_valid():
             # Save the form to add the station to db
             form.save()
@@ -125,3 +126,22 @@ class StationSettingsView(LoginRequiredMixin, View):
             return redirect('dashboard:stations')
         # re-render the form (with any errors)
         return render(request, 'dashboard/station_settings.html', {'form': form})
+
+
+class StationStateUpdateView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        """
+        """
+        station = get_object_or_404(Station, pk=kwargs.get('pk'))
+        form = StationStateForm(request.POST, instance=station)
+        if form.is_valid():
+            # Save the form to update the station in db
+            station = form.save()
+            # get and return the new station state as JSON:
+            return JsonResponse(station.getState())
+
+        # return a bad request error response:
+        return HttpResponseBadRequest()
+
+
