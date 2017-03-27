@@ -4,19 +4,19 @@
 {% block title %}Stations{% endblock title %}
 
 {% block main %}
+  {% csrf_token %}
   <div class="stations">
   {% for station in stations %}
-    <div class="station card" data-update-url="{% url 'dashboard:station_state_update' pk=station.pk %}">
-
+    <div class="station card" data-fetch-url="{% url 'dashboard:station_fetch_state' pk=station.pk %}" data-update-url="{% url 'dashboard:station_update_state' pk=station.pk %}">
       <div class="header">
         <h4 class="subtitle small-header">Station</h4>
         <h2 class="title medium-header">{{ station.name }}</h2>
       </div>
 
       <div class="content">
-        <div class="station-controls sensor">
+        <div class="station-controls sensor {% if not station.is_active %} disabled{% endif %}">
           <div class="indicator-graphic">
-            <svg  class="effect" data-max-humidity-angle="{{ station.MAX_HUMIDITY_ANGLE }}" style="stroke-dasharray: {{ station.get_current_humidity_angle }} {{ station.MAX_HUMIDITY_ANGLE }}'">
+            <svg  class="effect" data-max-humidity-angle="{{ station.MAX_HUMIDITY_ANGLE }}" style="stroke-dasharray: {{ station.get_current_humidity_angle }} {{ station.MAX_HUMIDITY_ANGLE }}">
               <circle r="50%" cx="50%" cy="50%"></circle>
             </svg>
             <div class="content">
@@ -36,23 +36,23 @@
           </div>
         </div>
 
-        <div class="station-controls sprinkler">
+        <div class="station-controls sprinkler {% if not station.is_active %} disabled{% endif %}">
           <div class="indicator-graphic">
-            <div class="effect {{ station.sprinkler_status }}"></div>
+            <div class="effect{% if station.sprinkler_is_on %} on{% endif %}"></div>
             <div class="content">
               <img class="icon" src="{% static 'img/tap.svg' %}">
             </div>
           </div>
           <div class="controls">
             <h3 class="title">Sprinkler</h3>
-            <span class="value" data-value="{{ station.sprinkler_status }}">{{ station.sprinkler_status }}</span>
-            <a class="btn btn-toggle sprinkler-status-toggle{% if station.sprinkler_mode == station.SPRINKLER_MANUAL %} {{ station.sprinkler_status }}{% else %} hidden{% endif %}">
+            <span class="value" data-value="{{ station.sprinkler_is_on|lower }}">{% if station.sprinkler_is_on %}on{% else %}off{% endif %}</span>
+            <a class="btn btn-toggle sprinkler-status-toggle{% if station.sprinkler_is_on %} on{% endif %}{% if station.sprinkler_mode == station.SPRINKLER_AUTO %} hidden{% endif %}">
               <span class="switch"></span>
             </a>
             <span class="details">
               <ul class="mode-selector tabs">
                 {% for mode in station.SPRINKLER_MODES %}
-                  <li class="tab{% if mode.0 == station.sprinkler_mode %} active{% endif %}" data-value="{{ mode.0 }}">
+                  <li class="tab{% if mode.0 == station.sprinkler_mode %} active{% endif %}{% if not station.is_active %} disabled{% endif %}" data-value="{{ mode.0 }}">
                     {{ mode.1 }}
                   </li>
                 {% endfor %}

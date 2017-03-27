@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View
 from django.contrib.auth import authenticate, login
@@ -128,13 +130,23 @@ class StationSettingsView(LoginRequiredMixin, View):
         return render(request, 'dashboard/station_settings.html', {'form': form})
 
 
+class StationStateFetchView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        """
+        """
+        station = get_object_or_404(Station, pk=kwargs.get('pk'))
+        return JsonResponse(station.getState());
+
+
 class StationStateUpdateView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         """
         """
         station = get_object_or_404(Station, pk=kwargs.get('pk'))
-        form = StationStateForm(request.POST, instance=station)
+        data = json.loads(request.body.decode('utf-8'))
+        form = StationStateForm(data, instance=station)
         if form.is_valid():
             # Save the form to update the station in db
             station = form.save()

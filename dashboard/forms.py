@@ -22,4 +22,11 @@ class StationStateForm(forms.ModelForm):
     class Meta:
         model = Station
         fields = ('is_active', 'current_humidity',
-                  'sprinkler_mode', 'sprinkler_status')
+                  'sprinkler_mode', 'sprinkler_is_on')
+
+    def save(self, commit=True):
+        instance = super(StationStateForm, self).save(commit=False)
+        if not instance.is_active:
+            instance.sprinkler_is_on = False
+        instance.save()
+        return instance

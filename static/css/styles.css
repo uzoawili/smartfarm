@@ -26,7 +26,7 @@ a {
     text-transform: uppercase;
 }
 .hidden {
-    display: none !important;
+    visibility: hidden;
 }
 
 
@@ -158,8 +158,12 @@ a {
 .btn-toggle:hover {
     color: #73AE33;
 }
-.btn-toggle:active, .btn-toggle:focus {
+.btn-toggle:active,
+.btn-toggle:focus {
     color: #529C00;
+}
+.btn-toggle:not(.on) {
+
 }
 .btn-toggle .switch {
     position: relative;
@@ -190,6 +194,7 @@ a {
 .btn-toggle.on .switch:after {
     left: calc(100% - 16px - 2px);
 }
+
 .btn-toggle .caption {
     margin-left: 10px;
 }
@@ -213,26 +218,21 @@ a {
     text-transform: uppercase;
     flex-grow: 1;
     padding: 5px 0 10px;
-}
-.tabs > .tab:after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 5px;
-    left: 0;
-    bottom: 0;
-    background-color: #DDDDDD;
-    pointer-events: none;
+    border-bottom: 5px solid #DDDDDD;
     transition: 0.3s;
-}
-.tabs > .tab.active:after {
-    background-color: #73AE33;
-}
-
-.tabs > .tab:not(.active):hover,
-.tabs > .tab:not(.active):focus {
-    color: #529C00;
     cursor: pointer;
+}
+.tabs > .tab:not(.active):not(.disabled):hover,
+.tabs > .tab:not(.active):not(.disabled):focus {
+    color: #529C00;
+}
+.tabs > .tab.active:not(.disabled) {
+    border-bottom-color: #73AE33;
+}
+.tabs > .tab.active,
+.tabs > .tab.disabled {
+    cursor: none;
+    pointer-events: none;
 }
 
 
@@ -357,6 +357,11 @@ a {
     display: flex;
     padding: 50px 0;
     border-top: 1px solid #DDDDDD;
+    transition: 0.3s;
+}
+.station-controls.disabled {
+    opacity: 0.7;
+    pointer-events: none;
 }
 .station-controls:first-child {
     margin-top: -30px;

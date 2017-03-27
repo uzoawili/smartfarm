@@ -1,8 +1,8 @@
 from django.conf.urls import url
 from django.contrib.auth.views import logout_then_login
 from .views import (
-    IndexView, LoginView, CreateUserView, StationsView,
-    StationSetupView, StationSettingsView, StationStateUpdateView
+    IndexView, LoginView, CreateUserView, StationsView, StationSetupView,
+    StationSettingsView, StationStateUpdateView, StationStateFetchView
 )
 
 urlpatterns = [
@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^stations/$', StationsView.as_view(), name='stations'),
     url(r'^stations/setup/$', StationSetupView.as_view(), name='station_setup'),
     url(r'^stations/(?P<pk>[0-9]+)/settings/$', StationSettingsView.as_view(), name='station_settings'),
-    url(r'^stations/(?P<pk>[0-9]+)/state-update/$', StationStateUpdateView.as_view(), name='station_state_update'),
+    url(r'^stations/(?P<pk>[0-9]+)/state/fetch/$', StationStateFetchView.as_view(), name='station_fetch_state'),
+    url(r'^stations/(?P<pk>[0-9]+)/state/update/$', StationStateUpdateView.as_view(), name='station_update_state'),
 ]

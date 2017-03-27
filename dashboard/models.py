@@ -25,26 +25,16 @@ class Station(models.Model):
      (PUMP_PIN_2, 'Sprinkler Pump 2'),
     )
 
-    # Sprinkler control values
+    # Sprinkler mode values and choices
     SPRINKLER_MANUAL = "Manual"
     SPRINKLER_AUTO = "Auto"
-    SPRINKLER_ON = 'On'
-    SPRINKLER_OFF = 'Off'
 
-    # Sprinkler control choices
     SPRINKLER_MODES = (
         (SPRINKLER_AUTO, SPRINKLER_AUTO),
         (SPRINKLER_MANUAL, SPRINKLER_MANUAL),
     )
-    SPRINKLER_STATUSES = (
-        (SPRINKLER_ON, SPRINKLER_ON),
-        (SPRINKLER_OFF, SPRINKLER_OFF),
-    )
-    SPRINKLER_STATUS_BINARY_MAP = {
-        SPRINKLER_ON: 1,
-        SPRINKLER_OFF: 0,
-    }
-    MAX_HUMIDITY_ANGLE = 300;
+    # humidity indicator maximum angle
+    MAX_HUMIDITY_ANGLE = 300
 
     # station settings fields
     name = models.CharField(max_length=255, verbose_name='Station Name')
@@ -59,13 +49,10 @@ class Station(models.Model):
     notifications_email = models.EmailField(blank=True, null=True, verbose_name='Notifications Email')
 
     # station status fields
-    is_active = models.BooleanField(default=False)
-    current_humidity = models.SmallIntegerField(null=True, default=None)
-    sprinkler_mode = models.CharField(choices=SPRINKLER_MODES, default=SPRINKLER_AUTO, max_length=255)
-    sprinkler_status = models.CharField(choices=SPRINKLER_STATUSES, default=SPRINKLER_OFF, max_length=255)
-
-    def get_binary_sprinkler_status(self):
-        return self.SPRINKLER_STATUS_BINARY_MAP[self.sprinkler_status]
+    is_active = models.BooleanField(blank=True, default=False)
+    current_humidity = models.SmallIntegerField(blank=True, null=True, default=None)
+    sprinkler_mode = models.CharField(blank=True, choices=SPRINKLER_MODES, default=SPRINKLER_AUTO, max_length=255)
+    sprinkler_is_on = models.BooleanField(blank=True, default=False)
 
     def get_current_humidity_angle(self):
         if self.is_active and self.current_humidity is not None:
@@ -77,5 +64,5 @@ class Station(models.Model):
             'is_active': self.is_active,
             'current_humidity': self.current_humidity,
             'sprinkler_mode': self.sprinkler_mode,
-            'sprinkler_status': self.sprinkler_status,
+            'sprinkler_is_on': self.sprinkler_is_on,
         }
