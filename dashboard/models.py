@@ -1,4 +1,5 @@
 from django.db import models
+from jsonfield import JSONField
 
 
 class Station(models.Model):
@@ -40,6 +41,8 @@ class Station(models.Model):
     name = models.CharField(max_length=255, verbose_name='Station Name')
     min_humidity = models.SmallIntegerField(verbose_name='Min Humidity')
     max_humidity = models.SmallIntegerField(verbose_name='Max Humidity')
+    longitude = models.FloatField(blank=True, null=True, verbose_name='Longitude')
+    latitude = models.FloatField(blank=True, null=True, verbose_name='latitude')
     sensor = models.CharField(choices=SENSORS_PROBES, max_length=255, verbose_name='Sensor')
     sprinkler = models.CharField(choices=SPRINKLER_PUMPS, max_length=255, verbose_name='Sprinkler')
     enable_notifications = models.BooleanField(default=False, verbose_name='Send Notifications',
@@ -60,9 +63,53 @@ class Station(models.Model):
         return 0
 
     def getState(self):
-        return {
+        station_state = {
             'is_active': self.is_active,
             'current_humidity': self.current_humidity,
             'sprinkler_mode': self.sprinkler_mode,
             'sprinkler_is_on': self.sprinkler_is_on,
         }
+        return station_state
+
+    def syncWithPhysical(self):
+        self.triggerSprinkler()
+        self.readSensor()
+        if self.sprinkler_mode == self.SPRINKLER_AUTO:
+            self.autoRegulate()
+
+
+    def triggerSprinkler(self):
+        pass
+
+    def readSensor(self):
+        pass
+
+    def autoRegulate(self):
+        if self.current_humidity < self.min_humidity:
+            self.sprinkler_is_on = True;
+        elif self.current_humidity > self.max_humidity:
+            self.sprinkler_is_on = False;
+        # forecast = WeatherForecast.getCurrentData(self.latitude, self.longitude)
+        self.save()
+
+
+class WeatherForecast(models.Model):
+    """
+    model representation of a WeatherForecast from darksky.net for a
+    period of about an hour from the time of request.
+    """
+    PRECIP_TYPE_RAIN = 'rain'
+
+    time_of_request = models.DateTimeField(verbose_name='Time of Request')
+    longitude = models.FloatField(verbose_name='Longitude')
+    latitude = models.FloatField(verbose_name='latitude')
+    data = JSONField()
+
+    @staticmethod
+    def getCurrentData(latitude, longitude):
+        pass
+
+    @staticmethod
+    def fetchForecast(latitude, longitude):
+        pass
+

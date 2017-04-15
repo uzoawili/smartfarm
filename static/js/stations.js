@@ -1,11 +1,10 @@
 
 var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-var pollInterval = 2000;
+var pollInterval = 5000;
 var stations = [];
 
-
-
 function StationController ($stationCard) {
+
   this.card = $stationCard;
 
   this.activeStatusToggle = this.card.find('.active-status-toggle');
@@ -139,13 +138,12 @@ $(document).ready(function () {
     "timeOut": "5000"
   }
 
-  // initialize the  stations
+  // initialize the stations:
   $('.station.card').each(function () {
     stations.push(new StationController($(this)));
   });
 
-  //  start the polling
-  // stations[0].fetchServerState();
+  //  start the polling:
   setInterval(function () {
     stations.forEach(function(station) {
       station.fetchServerState();
