@@ -131,3 +131,8 @@ STATICFILES_DIRS = [
 
 LOGIN_URL = 'dashboard:login'
 
+DARK_SKY_SETTINGS = {
+    'endpoint': 'https://api.darksky.net/forecast/fab40a14f74a4a8eb23444c6d0b161a1/6.5178,3.3827',
+    'key': '66d0b4fc-1ce5-d588-48d4-14ad13687a89'
+}
+

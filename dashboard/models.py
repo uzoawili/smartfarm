@@ -1,5 +1,9 @@
+import requests
+import json
+
 from django.db import models
 from jsonfield import JSONField
+from datetime import datetime, timedelta
 
 
 class Station(models.Model):
@@ -79,7 +83,8 @@ class Station(models.Model):
 
 
     def triggerSprinkler(self):
-        pass
+        binary_status = int(self.sprinkler_is_on)
+
 
     def readSensor(self):
         pass
@@ -98,18 +103,32 @@ class WeatherForecast(models.Model):
     model representation of a WeatherForecast from darksky.net for a
     period of about an hour from the time of request.
     """
-    PRECIP_TYPE_RAIN = 'rain'
 
-    time_of_request = models.DateTimeField(verbose_name='Time of Request')
+    time = models.DateTimeField(verbose_name='Time of Request')
     longitude = models.FloatField(verbose_name='Longitude')
     latitude = models.FloatField(verbose_name='latitude')
     data = JSONField()
 
     @staticmethod
-    def getCurrentData(latitude, longitude):
-        pass
+    def get_forecast_data(latitude, longitude):
+        one_hour_ago = datetime.now() - timedelta(hours=1)
+        forecast = WeatherForecast.objects.filter(latitude=latitude, longitude=longitude,
+                                                  time__gt=one_hour_ago)
+        if not forecast.exists():
+            forecast = WeatherForecast.fetch_forecast(latitude, longitude)
+
+        return forecast
 
     @staticmethod
-    def fetchForecast(latitude, longitude):
-        pass
+    def fetch_forecast(latitude, longitude):
+        url = 'https://api.darksky.net/forecast/fab40a14f74a4a8eb23444c6d0b161a1/6.5178,3.3827'
+        headers = { 'cache-control': 'no-cache' }
+        response = requests.request('GET', url, headers=headers)
+        forecast = None
+        if response.status_code == 200:
+            response = json.loads(response.text)
+            current_data = response['currently']
+            forecast, created = WeatherForecast.objects.update_or_create(latitude=latitude, longitude=longitude,
+                                                     data=current_data, time=current_data.time)
+        return forecast
 

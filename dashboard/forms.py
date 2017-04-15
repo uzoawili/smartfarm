@@ -11,7 +11,7 @@ class StationSettingsForm(forms.ModelForm):
 
     class Meta:
         model = Station
-        fields = ('name', 'min_humidity', 'max_humidity',
+        fields = ('name', 'latitude', 'longitude', 'min_humidity', 'max_humidity',
                   'sensor', 'sprinkler', 'enable_notifications',
                   'notifications_email')
 
