@@ -136,7 +136,7 @@ class StationStateFetchView(LoginRequiredMixin, View):
         """
         """
         station = get_object_or_404(Station, pk=kwargs.get('pk'))
-        return JsonResponse(station.getState());
+        return JsonResponse(station.get_state())
 
 
 class StationStateUpdateView(LoginRequiredMixin, View):
@@ -151,7 +151,7 @@ class StationStateUpdateView(LoginRequiredMixin, View):
             # Save the form to update the station in db
             station = form.save()
             # get and return the new station state as JSON:
-            return JsonResponse(station.getState())
+            return JsonResponse(station.get_state())
 
         # return a bad request error response:
         return HttpResponseBadRequest()

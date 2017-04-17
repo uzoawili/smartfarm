@@ -1,14 +1,24 @@
 import requests
 import json
+import random
+import time
+from datetime import datetime, timedelta
 
 from django.db import models
+from django.conf import settings
+
 from jsonfield import JSONField
-from datetime import datetime, timedelta
+# import RPi.GPIO as GPIO
+from .utils import GPIO
+
+
+# for pin numbering, choose BCM(aka GPIO numbering)
+GPIO.setmode(GPIO.BCM)
 
 
 class Station(models.Model):
     """
-    model representation of a Smartfarm station which physically comprises
+    model representing a Smartfarm station which physically comprises
     of a humidity sensor probe and a sprinkler pump outlet, commonly used
     to monitor and control a single plant bed  but can be setup as per the
     users requirements.
@@ -19,8 +29,11 @@ class Station(models.Model):
     # pump breakout pins
     PUMP_PIN_1 = 'GPIO20'
     PUMP_PIN_2 = 'GPIO21'
+    # Blinker pin:
+    BLINKER_PIN_1 = 'GPIO25'
+    BLINKER_PIN_2 = 'GPIO26'
 
-    # sensor and probe choices
+    # sensor, probe and blinker choices
     SENSORS_PROBES = (
      (SENSOR_PIN_1, 'Sensor Probe 1'),
      (SENSOR_PIN_2, 'Sensor Probe 2'),
@@ -29,7 +42,10 @@ class Station(models.Model):
      (PUMP_PIN_1, 'Sprinkler Pump 1'),
      (PUMP_PIN_2, 'Sprinkler Pump 2'),
     )
-
+    BLINKER_PINS = (
+        (BLINKER_PIN_1, 'Blinker Pin 1'),
+        (BLINKER_PIN_2, 'Blinker Pin 2'),
+    )
     # Sprinkler mode values and choices
     SPRINKLER_MANUAL = "Manual"
     SPRINKLER_AUTO = "Auto"
@@ -49,6 +65,7 @@ class Station(models.Model):
     latitude = models.FloatField(blank=True, null=True, verbose_name='latitude')
     sensor = models.CharField(choices=SENSORS_PROBES, max_length=255, verbose_name='Sensor')
     sprinkler = models.CharField(choices=SPRINKLER_PUMPS, max_length=255, verbose_name='Sprinkler')
+    blinker = models.CharField(choices=BLINKER_PINS, max_length=255, verbose_name='Blinker')
     enable_notifications = models.BooleanField(default=False, verbose_name='Send Notifications',
                                                help_text='Smartfarm will send email reminders to this email'
                                                          ' if the sprinkler is in manual mode and humidity'
@@ -66,7 +83,7 @@ class Station(models.Model):
             return (self.current_humidity / 100) * self.MAX_HUMIDITY_ANGLE
         return 0
 
-    def getState(self):
+    def get_state(self):
         station_state = {
             'is_active': self.is_active,
             'current_humidity': self.current_humidity,
@@ -75,27 +92,45 @@ class Station(models.Model):
         }
         return station_state
 
-    def syncWithPhysical(self):
-        self.triggerSprinkler()
-        self.readSensor()
+    def sync_with_io(self):
+        if self.is_active:
+            self.setup_io()
+            self.trigger_sprinkler()
+            self.read_sensor()
+            self.blink()
+
+    def setup_io(self):
+        if not GPIO.gpio_function(int(self.sensor)) == GPIO.IN:
+            GPIO.setup(int(self.sensor), GPIO.IN)
+        if not GPIO.gpio_function(int(self.sprinkler)) == GPIO.OUT:
+            GPIO.setup(int(self.sprinkler), GPIO.OUT)
+        if not GPIO.gpio_function(int(self.blinker)) == GPIO.OUT:
+            GPIO.setup(int(self.blinker), GPIO.OUT)
+
+    def trigger_sprinkler(self):
+        GPIO.output(int(self.sprinkler), self.sprinkler_is_on)
+
+    def read_sensor(self):
+        sensor_value = GPIO.input(int(self.sensor))
+        self.current_humidity = random.randint(41, 100) if sensor_value else random.randint(0, 40)
         if self.sprinkler_mode == self.SPRINKLER_AUTO:
-            self.autoRegulate()
-
-
-    def triggerSprinkler(self):
-        binary_status = int(self.sprinkler_is_on)
-
-
-    def readSensor(self):
-        pass
-
-    def autoRegulate(self):
-        if self.current_humidity < self.min_humidity:
-            self.sprinkler_is_on = True;
-        elif self.current_humidity > self.max_humidity:
-            self.sprinkler_is_on = False;
-        # forecast = WeatherForecast.getCurrentData(self.latitude, self.longitude)
+            self.auto_regulate()
         self.save()
+
+    def auto_regulate(self):
+        # if self.use_forecast:
+        # forecast = WeatherForecast.get_forecast_data(self.latitude, self.longitude)
+        # if forecast and :
+        # self.current_humidity += (forecast * 100 +
+        if self.current_humidity < self.min_humidity:
+            self.sprinkler_is_on = True
+        elif self.current_humidity > self.max_humidity:
+            self.sprinkler_is_on = False
+
+    def blink(self):
+        GPIO.output(int(self.blinker), True)
+        time.sleep(settings.STATION_BLINKER_DELAY)
+        GPIO.output(int(self.blinker), False)
 
 
 class WeatherForecast(models.Model):
@@ -103,7 +138,6 @@ class WeatherForecast(models.Model):
     model representation of a WeatherForecast from darksky.net for a
     period of about an hour from the time of request.
     """
-
     time = models.DateTimeField(verbose_name='Time of Request')
     longitude = models.FloatField(verbose_name='Longitude')
     latitude = models.FloatField(verbose_name='latitude')
@@ -112,8 +146,10 @@ class WeatherForecast(models.Model):
     @staticmethod
     def get_forecast_data(latitude, longitude):
         one_hour_ago = datetime.now() - timedelta(hours=1)
-        forecast = WeatherForecast.objects.filter(latitude=latitude, longitude=longitude,
-                                                  time__gt=one_hour_ago)
+        forecast = WeatherForecast.objects.filter(
+            latitude=latitude, longitude=longitude,
+            time__gt=one_hour_ago
+        )
         if not forecast.exists():
             forecast = WeatherForecast.fetch_forecast(latitude, longitude)
 
@@ -128,7 +164,9 @@ class WeatherForecast(models.Model):
         if response.status_code == 200:
             response = json.loads(response.text)
             current_data = response['currently']
-            forecast, created = WeatherForecast.objects.update_or_create(latitude=latitude, longitude=longitude,
-                                                     data=current_data, time=current_data.time)
+            forecast, created = WeatherForecast.objects.update_or_create(
+                latitude=latitude, longitude=longitude,
+                data=current_data, time=current_data.time
+            )
         return forecast
 

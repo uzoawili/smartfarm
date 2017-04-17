@@ -136,3 +136,8 @@ DARK_SKY_SETTINGS = {
     'key': '66d0b4fc-1ce5-d588-48d4-14ad13687a89'
 }
 
+STATION_IO_SYNC = {
+    'thread_name': 'sync_stations_with_IO',
+    'interval': 5
+}
+STATION_BLINKER_DELAY = 0.5
