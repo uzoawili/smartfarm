@@ -13,7 +13,7 @@ import RPi.GPIO as GPIO
 
 # import SPI (for hardware SPI) and MCP3008 library
 # import Adafruit_GPIO.SPI as SPI
-# import Adafruit_MCP3008
+import Adafruit_MCP3008
 import spidev
 
 
@@ -34,12 +34,17 @@ class Station(models.Model):
     SPI_PORT = 0
     SPI_DEVICE = 0
     SENSOR_ADC_CHANNEL = 0
+
+    CLK = 18
+    MISO = 23
+    MOSI = 24
+    CS = 25
    
     # pump breakout pins
-    PUMP_PIN_1 = '23'
+    PUMP_PIN_1 = '6'
     
     # Blinker pin:
-    BLINKER_PIN_1 = '24'
+    BLINKER_PIN_1 = '5'
 
     # sensor, probe and blinker choices
     SENSORS_PROBES = (
@@ -106,8 +111,9 @@ class Station(models.Model):
 
     def setup_io(self):
         # self.mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(self.SPI_PORT, self.SPI_DEVICE))
-        self.spi = spidev.SpiDev()
-        self.spi.open(0,0)
+        self.mcp = Adafruit_MCP3008.MCP3008(clk=self.CLK, cs=self.CS, miso=self.MISO, mosi=self.MOSI)
+        # self.spi = spidev.SpiDev()
+        # self.spi.open(0,0)
         # if not GPIO.gpio_function(int(self.sprinkler)) == GPIO.OUT:
         GPIO.setup(int(self.sprinkler), GPIO.OUT)
         # if not GPIO.gpio_function(int(self.blinker)) == GPIO.OUT:
@@ -117,15 +123,15 @@ class Station(models.Model):
         GPIO.output(int(self.sprinkler), self.sprinkler_is_on)
 
     def read_sensor(self):
-        # sensor_value = self.mcp.read_adc(self.SENSOR_ADC_CHANNEL)
-        sensor_value = self.readChannel(self.SENSOR_ADC_CHANNEL)
+        sensor_value = self.mcp.read_adc(self.SENSOR_ADC_CHANNEL)
+        # sensor_value = self.read_channel(self.SENSOR_ADC_CHANNEL)
         self.current_humidity = (sensor_value / float(1023)) * 100
         # self.current_humidity = random.randint(41, 100) if sensor_value else random.randint(0, 40)
         if self.sprinkler_mode == self.SPRINKLER_AUTO:
             self.auto_regulate()
         self.save()
 
-    def readChannel(self, channel):
+    def read_channel(self, channel):
         import pdb; pdb.set_trace()
         # Function to read SPI data from MCP3008 chip
         # Channel must be an integer 0-7
