@@ -41,10 +41,10 @@ class Station(models.Model):
     CS = 25
    
     # pump breakout pins
-    PUMP_PIN_1 = '6'
+    PUMP_PIN_1 = '5'
     
     # Blinker pin:
-    BLINKER_PIN_1 = '5'
+    BLINKER_PIN_1 = '6'
 
     # sensor, probe and blinker choices
     SENSORS_PROBES = (
@@ -123,6 +123,7 @@ class Station(models.Model):
         GPIO.output(int(self.sprinkler), self.sprinkler_is_on)
 
     def read_sensor(self):
+        # import pdb; pdb.set_trace()
         sensor_value = self.mcp.read_adc(self.SENSOR_ADC_CHANNEL)
         # sensor_value = self.read_channel(self.SENSOR_ADC_CHANNEL)
         self.current_humidity = (sensor_value / float(1023)) * 100
@@ -132,7 +133,6 @@ class Station(models.Model):
         self.save()
 
     def read_channel(self, channel):
-        import pdb; pdb.set_trace()
         # Function to read SPI data from MCP3008 chip
         # Channel must be an integer 0-7
         adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
@@ -150,6 +150,7 @@ class Station(models.Model):
             self.sprinkler_is_on = False
 
     def blink(self):
+        # import pdb; pdb.set_trace()
         GPIO.output(int(self.blinker), True)
         time.sleep(settings.STATION_BLINKER_DELAY)
         GPIO.output(int(self.blinker), False)

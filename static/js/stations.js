@@ -1,6 +1,6 @@
 
 var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-var pollInterval = 5000;
+var pollInterval = 2000;
 var stations = [];
 
 function StationController ($stationCard) {
