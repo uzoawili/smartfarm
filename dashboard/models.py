@@ -105,23 +105,33 @@ class Station(models.Model):
             self.blink()
 
     def setup_io(self):
-        self.mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(self.SPI_PORT, self.SPI_DEVICE))
-        # if not GPIO.gpio_function(int(self.sprinkler)) == GPIO.OUT:
-        GPIO.setup(int(self.sprinkler), GPIO.OUT)
-        # if not GPIO.gpio_function(int(self.blinker)) == GPIO.OUT:
-        GPIO.setup(int(self.blinker), GPIO.OUT)
+        # self.mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(self.SPI_PORT, self.SPI_DEVICE))
+        self.spi = spidev.SpiDev()
+        self.spi.open(0,0)
+        if not GPIO.gpio_function(int(self.sprinkler)) == GPIO.OUT:
+            GPIO.setup(int(self.sprinkler), GPIO.OUT)
+        if not GPIO.gpio_function(int(self.blinker)) == GPIO.OUT:
+            GPIO.setup(int(self.blinker), GPIO.OUT)
 
     def trigger_sprinkler(self):
         GPIO.output(int(self.sprinkler), self.sprinkler_is_on)
 
     def read_sensor(self):
         # import pdb; pdb.set_trace()
-        sensor_value = self.mcp.read_adc(self.SENSOR_ADC_CHANNEL)
-        self.current_humidity = (sensor_value / 1023) * 100
+        # sensor_value = self.mcp.read_adc(self.SENSOR_ADC_CHANNEL)
+        sensor_value = self.spi.ReadChannel(self.SENSOR_ADC_CHANNEL)
+        self.current_humidity = (sensor_value / float(1023)) * 100
         # self.current_humidity = random.randint(41, 100) if sensor_value else random.randint(0, 40)
         if self.sprinkler_mode == self.SPRINKLER_AUTO:
             self.auto_regulate()
         self.save()
+
+    def ReadChannel(self, channel):
+        # Function to read SPI data from MCP3008 chip
+        # Channel must be an integer 0-7
+        adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
+        data = ((adc[1] & 3) << 8) + adc[2]
+        return data
 
     def auto_regulate(self):
         # if self.use_forecast:
