@@ -8,8 +8,13 @@ from django.db import models
 from django.conf import settings
 
 from jsonfield import JSONField
-# import RPi.GPIO as GPIO
-from .utils import GPIO
+
+import RPi.GPIO as GPIO
+
+# import SPI (for hardware SPI) and MCP3008 library
+import Adafruit_GPIO.SPI as SPI
+import Adafruit_MCP3008
+
 
 
 # for pin numbering, choose BCM(aka GPIO numbering)
@@ -24,27 +29,26 @@ class Station(models.Model):
     users requirements.
     """
     # sensor breakout pins
-    SENSOR_PIN_1 = 'GPIO23'
-    SENSOR_PIN_2 = 'GPIO24'
+    SENSOR_PIN_1 = '17'
+    SPI_PORT = 0
+    SPI_DEVICE = 0
+    SENSOR_ADC_CHANNEL = 0
+   
     # pump breakout pins
-    PUMP_PIN_1 = 'GPIO20'
-    PUMP_PIN_2 = 'GPIO21'
+    PUMP_PIN_1 = '23'
+    
     # Blinker pin:
-    BLINKER_PIN_1 = 'GPIO25'
-    BLINKER_PIN_2 = 'GPIO26'
+    BLINKER_PIN_1 = '24'
 
     # sensor, probe and blinker choices
     SENSORS_PROBES = (
      (SENSOR_PIN_1, 'Sensor Probe 1'),
-     (SENSOR_PIN_2, 'Sensor Probe 2'),
     )
     SPRINKLER_PUMPS = (
      (PUMP_PIN_1, 'Sprinkler Pump 1'),
-     (PUMP_PIN_2, 'Sprinkler Pump 2'),
     )
     BLINKER_PINS = (
         (BLINKER_PIN_1, 'Blinker Pin 1'),
-        (BLINKER_PIN_2, 'Blinker Pin 2'),
     )
     # Sprinkler mode values and choices
     SPRINKLER_MANUAL = "Manual"
@@ -100,8 +104,7 @@ class Station(models.Model):
             self.blink()
 
     def setup_io(self):
-        if not GPIO.gpio_function(int(self.sensor)) == GPIO.IN:
-            GPIO.setup(int(self.sensor), GPIO.IN)
+	    self.mcp = Adafruit_MCP3008(spi=SPI.SpiDev(self.SPI_PORT, self.SPI_DEVICE))
         if not GPIO.gpio_function(int(self.sprinkler)) == GPIO.OUT:
             GPIO.setup(int(self.sprinkler), GPIO.OUT)
         if not GPIO.gpio_function(int(self.blinker)) == GPIO.OUT:
@@ -111,8 +114,9 @@ class Station(models.Model):
         GPIO.output(int(self.sprinkler), self.sprinkler_is_on)
 
     def read_sensor(self):
-        sensor_value = GPIO.input(int(self.sensor))
-        self.current_humidity = random.randint(41, 100) if sensor_value else random.randint(0, 40)
+        sensor_value = self.mcp.read_adc(self.SENSOR_ADC_CHANNEL)
+        self.current_humidity = (sensor_value / 3.3) * 100
+        # self.current_humidity = random.randint(41, 100) if sensor_value else random.randint(0, 40)
         if self.sprinkler_mode == self.SPRINKLER_AUTO:
             self.auto_regulate()
         self.save()

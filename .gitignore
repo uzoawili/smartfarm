@@ -39,3 +39,6 @@ staticfiles/
 # database
 db.sqlite3
 /dashboard/utils.py
+
+# ngrok
+ngrok
