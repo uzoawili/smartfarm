@@ -104,7 +104,7 @@ class Station(models.Model):
             self.blink()
 
     def setup_io(self):
-	    self.mcp = Adafruit_MCP3008(spi=SPI.SpiDev(self.SPI_PORT, self.SPI_DEVICE))
+        self.mcp = Adafruit_MCP3008(spi=SPI.SpiDev(self.SPI_PORT, self.SPI_DEVICE))
         if not GPIO.gpio_function(int(self.sprinkler)) == GPIO.OUT:
             GPIO.setup(int(self.sprinkler), GPIO.OUT)
         if not GPIO.gpio_function(int(self.blinker)) == GPIO.OUT:
@@ -173,4 +173,3 @@ class WeatherForecast(models.Model):
                 data=current_data, time=current_data.time
             )
         return forecast
-
