@@ -52,6 +52,7 @@ StationController.prototype.renderState = function (state) {
   }
   // current_humidity indicator angle
   this.sensorIndicatorEffect.css('stroke-dasharray', this.getHumidityAngle(state) + ' ' + this.maxHumidityAngle);
+  var effectColor = (state.current_humidity < state)
   // sprinkler status value
   this.sprinklerStatusValue.data('value', state.sprinkler_is_on);
   this.sprinklerStatusValue.text((state.sprinkler_is_on ? 'on' : 'off'));

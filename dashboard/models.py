@@ -8,13 +8,8 @@ from django.db import models
 from django.conf import settings
 
 from jsonfield import JSONField
-
 import RPi.GPIO as GPIO
-
-# import SPI (for hardware SPI) and MCP3008 library
-# import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
-import spidev
 
 
 
@@ -42,10 +37,8 @@ class Station(models.Model):
    
     # pump breakout pins
     PUMP_PIN_1 = '5'
-    
     # Blinker pin:
     BLINKER_PIN_1 = '6'
-
     # sensor, probe and blinker choices
     SENSORS_PROBES = (
      (SENSOR_PIN_1, 'Sensor Probe 1'),
@@ -110,47 +103,29 @@ class Station(models.Model):
             self.blink()
 
     def setup_io(self):
-        # self.mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(self.SPI_PORT, self.SPI_DEVICE))
         self.mcp = Adafruit_MCP3008.MCP3008(clk=self.CLK, cs=self.CS, miso=self.MISO, mosi=self.MOSI)
-        # self.spi = spidev.SpiDev()
-        # self.spi.open(0,0)
-        # if not GPIO.gpio_function(int(self.sprinkler)) == GPIO.OUT:
         GPIO.setup(int(self.sprinkler), GPIO.OUT)
-        # if not GPIO.gpio_function(int(self.blinker)) == GPIO.OUT:
         GPIO.setup(int(self.blinker), GPIO.OUT)
 
     def trigger_sprinkler(self):
         GPIO.output(int(self.sprinkler), self.sprinkler_is_on)
 
     def read_sensor(self):
-        # import pdb; pdb.set_trace()
         sensor_value = self.mcp.read_adc(self.SENSOR_ADC_CHANNEL)
-        # sensor_value = self.read_channel(self.SENSOR_ADC_CHANNEL)
-        self.current_humidity = (sensor_value / float(1023)) * 100
-        # self.current_humidity = random.randint(41, 100) if sensor_value else random.randint(0, 40)
+        self.current_humidity = ((sensor_value / float(1023)) / 59) * 100
         if self.sprinkler_mode == self.SPRINKLER_AUTO:
             self.auto_regulate()
         self.save()
 
-    def read_channel(self, channel):
-        # Function to read SPI data from MCP3008 chip
-        # Channel must be an integer 0-7
-        adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
-        data = ((adc[1] & 3) << 8) + adc[2]
-        return data
-
     def auto_regulate(self):
         # if self.use_forecast:
-        # forecast = WeatherForecast.get_forecast_data(self.latitude, self.longitude)
-        # if forecast and :
-        # self.current_humidity += (forecast * 100 +
+        #   forecast = WeatherForecast.get_forecast_data(self.latitude, self.longitude)
         if self.current_humidity < self.min_humidity:
             self.sprinkler_is_on = True
         elif self.current_humidity > self.max_humidity:
             self.sprinkler_is_on = False
 
     def blink(self):
-        # import pdb; pdb.set_trace()
         GPIO.output(int(self.blinker), True)
         time.sleep(settings.STATION_BLINKER_DELAY)
         GPIO.output(int(self.blinker), False)
