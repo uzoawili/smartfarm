@@ -138,6 +138,6 @@ DARK_SKY_SETTINGS = {
 
 STATION_IO_SYNC = {
     'thread_name': 'sync_stations_with_IO',
-    'interval': 5
+    'interval': 2
 }
 STATION_BLINKER_DELAY = 0.5
