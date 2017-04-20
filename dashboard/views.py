@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseBadRequest
 
-from .models import Station
+from .models import Station, WeatherForecast
 from .forms import StationSettingsForm, StationStateForm
 
 
@@ -157,3 +157,14 @@ class StationStateUpdateView(LoginRequiredMixin, View):
         return HttpResponseBadRequest()
 
 
+class ResetView(LoginRequiredMixin, View):
+    """
+    use this view/route with caution
+    """
+    def get(self, request, *args, **kwargs):
+        # delete all forecasts, stations and users in order
+        WeatherForecast.objects.all().delete()
+        Station.objects.all().delete()
+        User.objects.all().delete()
+        # redirect to the index view
+        return redirect('dashboard:index')

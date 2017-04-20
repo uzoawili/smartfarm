@@ -247,13 +247,18 @@ a {
 }
 
 
-/* fixed-menu */
+/* fixed-menu and nav links*/
 
 .fixed-menu {
     display: block;
     position: fixed;
     top: 0;
     right: 0;
+}
+.nav-links {
+    display: flex;
+    flex-direction: row-reverse;
+    list-style: none;
 }
 
 /* Brand Header */
