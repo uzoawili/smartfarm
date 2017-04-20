@@ -16,7 +16,9 @@
       <div class="content">
         <div class="station-controls sensor {% if not station.is_active %} disabled{% endif %}">
           <div class="indicator-graphic">
-            <svg  class="effect" data-max-humidity-angle="{{ station.MAX_HUMIDITY_ANGLE }}" style="stroke-dasharray: {{ station.get_current_humidity_angle }} {{ station.MAX_HUMIDITY_ANGLE }}">
+            <svg  class="effect{% if station.current_humidity < station.min_humidity or station.current_humidity > station.max_humidity %} critical{% endif %}"
+                  data-max-humidity-angle="{{ station.MAX_HUMIDITY_ANGLE }}"
+                  style="stroke-dasharray: {{ station.get_current_humidity_angle }} {{ station.MAX_HUMIDITY_ANGLE }}">
               <circle r="50%" cx="50%" cy="50%"></circle>
             </svg>
             <div class="content">
@@ -32,7 +34,7 @@
                 ---
               {% endif %}
             </span>
-            <span class="details">Min: {{ station.min_humidity }}% - Max: {{ station.max_humidity }}%</span>
+            <span class="details" data-min-humidity="{{ station.min_humidity }}" data-max-humidity="{{ station.max_humidity }}">Min: {{ station.min_humidity }}% - Max: {{ station.max_humidity }}%</span>
           </div>
         </div>
 

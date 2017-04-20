@@ -1,6 +1,6 @@
 
 var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-var pollInterval = 5000;
+var pollInterval = 2000;
 var stations = [];
 
 function StationController ($stationCard) {
@@ -12,6 +12,7 @@ function StationController ($stationCard) {
 
   this.sensorIndicatorEffect = this.card.find('.sensor .indicator-graphic .effect');
   this.sensorStatusValue = this.card.find('.sensor .controls .value');
+  this.sensorDetails = this.card.find('.sensor .controls .details');
   
   this.sprinklerStatusToggle = this.card.find('.sprinkler-status-toggle');
   this.sprinklerModeTabs = this.card.find('.sprinkler .mode-selector .tab');
@@ -21,6 +22,8 @@ function StationController ($stationCard) {
   this.fetchStateUrl = this.card.data('fetchUrl');
   this.updateStateUrl = this.card.data('updateUrl');
   this.maxHumidityAngle = this.sensorIndicatorEffect.data('maxHumidityAngle');
+  this.minHumidity = this.sensorDetails.data('minHumidity');
+  this.maxHumidity = this.sensorDetails.data('maxHumidity');
 
   this.activeStatusToggle.click(this.handleAnyStateChange.bind(this));
   this.sprinklerStatusToggle.click(this.handleAnyStateChange.bind(this));
@@ -52,6 +55,7 @@ StationController.prototype.renderState = function (state) {
   }
   // current_humidity indicator angle
   this.sensorIndicatorEffect.css('stroke-dasharray', this.getHumidityAngle(state) + ' ' + this.maxHumidityAngle);
+  this.sensorIndicatorEffect.toggleClass('critical', !!(state.current_humidity && (state.current_humidity < this.minHumidity || state.current_humidity > this.maxHumidity)));
   // sprinkler status value
   this.sprinklerStatusValue.data('value', state.sprinkler_is_on);
   this.sprinklerStatusValue.text((state.sprinkler_is_on ? 'on' : 'off'));
