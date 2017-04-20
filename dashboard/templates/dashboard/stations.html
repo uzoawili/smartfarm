@@ -1,0 +1,90 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Stations{% endblock title %}
+
+{% block main %}
+  {% csrf_token %}
+  <div class="stations">
+  {% for station in stations %}
+    <div class="station card" data-fetch-url="{% url 'dashboard:station_fetch_state' pk=station.pk %}" data-update-url="{% url 'dashboard:station_update_state' pk=station.pk %}">
+      <div class="header">
+        <h4 class="subtitle small-header">Station</h4>
+        <h2 class="title medium-header">{{ station.name }}</h2>
+      </div>
+
+      <div class="content">
+        <div class="station-controls sensor {% if not station.is_active %} disabled{% endif %}">
+          <div class="indicator-graphic">
+            <svg  class="effect{% if station.current_humidity < station.min_humidity or station.current_humidity > station.max_humidity %} critical{% endif %}"
+                  data-max-humidity-angle="{{ station.MAX_HUMIDITY_ANGLE }}"
+                  style="stroke-dasharray: {{ station.get_current_humidity_angle }} {{ station.MAX_HUMIDITY_ANGLE }}">
+              <circle r="50%" cx="50%" cy="50%"></circle>
+            </svg>
+            <div class="content">
+              <img class="icon" src="{% static 'img/drop.svg' %}">
+            </div>
+          </div>
+          <div class="controls">
+            <h3 class="title">Soil Humidity</h3>
+            <span class="value" data-value="{{ station.current_humidity }}">
+              {% if station.is_active and station.current_humidity != None  %}
+                {{ station.current_humidity }}%
+              {% else %}
+                ---
+              {% endif %}
+            </span>
+            <span class="details" data-min-humidity="{{ station.min_humidity }}" data-max-humidity="{{ station.max_humidity }}">Min: {{ station.min_humidity }}% - Max: {{ station.max_humidity }}%</span>
+          </div>
+        </div>
+
+        <div class="station-controls sprinkler {% if not station.is_active %} disabled{% endif %}">
+          <div class="indicator-graphic">
+            <div class="effect{% if station.sprinkler_is_on %} on{% endif %}"></div>
+            <div class="content">
+              <img class="icon" src="{% static 'img/tap.svg' %}">
+            </div>
+          </div>
+          <div class="controls">
+            <h3 class="title">Sprinkler</h3>
+            <span class="value" data-value="{{ station.sprinkler_is_on|lower }}">{% if station.sprinkler_is_on %}on{% else %}off{% endif %}</span>
+            <a class="btn btn-toggle sprinkler-status-toggle{% if station.sprinkler_is_on %} on{% endif %}{% if station.sprinkler_mode == station.SPRINKLER_AUTO %} hidden{% endif %}">
+              <span class="switch"></span>
+            </a>
+            <span class="details">
+              <ul class="mode-selector tabs">
+                {% for mode in station.SPRINKLER_MODES %}
+                  <li class="tab{% if mode.0 == station.sprinkler_mode %} active{% endif %}{% if not station.is_active %} disabled{% endif %}" data-value="{{ mode.0 }}">
+                    {{ mode.1 }}
+                  </li>
+                {% endfor %}
+              </ul>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <a class="btn btn-toggle active-status-toggle {% if station.is_active %} on{% endif %}">
+          <span class="switch"></span>
+          <span class="caption" >{% if station.is_active %}Active{% else %}Inactive{% endif %}</span>
+        </a>
+        <a class="btn btn-option" href="{% url 'dashboard:station_settings' pk=station.pk %}">Settings</a>
+      </div>
+
+    </div>
+
+  {% empty %}
+    <div class="welcome-msg">
+      <p>Welcome to the control dashboard for Smartfarm - your IOT-based Smart Irrigation System.<br>
+        Setting up your station is easy! Follow the link below to get started!</p>
+      <a class="btn btn-primary" href="{% url 'dashboard:station_setup' %}">Setup Station</a>
+    </div>
+  {% endfor %}
+  </div>
+{% endblock main %}
+
+{% block extra_scripts %}
+  <script type="text/javascript" src="{% static 'js/stations.js' %}"></script>
+{% endblock extra_scripts %}
+

@@ -1,0 +1,77 @@
+{% load static %}
+
+<html>
+  <head>
+    <title>{% block title %}{% endblock title %} - Smartfarm - IOT Smart Irrigation System</title>
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+    <meta  name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+    {% block styles %}
+      <!-- fonts -->
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/toastr/2.1.3/toastr.css">
+      <!-- styles -->
+      <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+      {% block extra_styles %}{% endblock extra_styles %}
+    {% endblock styles %}
+  </head>
+
+  <body>
+
+  {% if request.user.is_authenticated %}
+    <ul class="fixed-menu nav-links">
+      <li class="nav-link"><a href="{% url 'dashboard:logout' %}" class="btn btn-option">Log Out</a></li>
+      <li class="nav-link"><a href="{% url 'dashboard:reset' %}" class="btn btn-option">Reset</a></li>
+    </ul>
+  {% endif %}
+
+    <div class="page-wrapper">
+
+      <div class="brand-header">
+          <img class="logo" src="{% static 'img/logo.svg' %}">
+          <h1 class="name large-header">Smartfarm</h1>
+          <span class="motto">IOT-based Smart Irrigation System</span>
+      </div>
+
+      {% block main %}
+
+        <div class="card">
+
+          <div class="header">
+            {% block card_subtitle_block %}
+              <h4 class="subtitle small-header">{% block card_subtitle %}---{% endblock %}</h4>
+            {% endblock %}
+            <h2 class="title medium-header">{% block card_title %}---{% endblock %}</h2>
+          </div>
+
+          <div class="content">
+            {% block card_content %}
+
+            {% endblock %}
+          </div>
+
+          {% block card_footer %}
+          <div class="footer">
+            {% block card_footer_options %}{% endblock %}
+          </div>
+          {% endblock %}
+        </div>
+
+      {% endblock main %}
+
+      <div class="page-footer">
+{#        <p class="credits">Final year project by <a class="reference" href="">Awili Joy Ebubechukwu</a></p>#}
+{#        <p class="details">Department of Computer Science - Class of 2017<br> Benson Idahosa Univesity, Benin City, Nigeria. </p>#}
+      </div>
+
+    </div>
+
+
+    {% block scripts %}
+      <!-- scripts -->
+      <script src="https://cdn.jsdelivr.net/jquery/3.1.1/jquery.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.6/semantic.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/g/jquery@3.1.1,toastr@2.1.3"></script>
+      {% block extra_scripts %}{% endblock extra_scripts %}
+    {% endblock scripts %}
+  </body>
+</html>

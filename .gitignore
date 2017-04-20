@@ -33,3 +33,9 @@ ENV/
 
 # staticfiles
 staticfiles/
+
+.DS_Store
+
+# database
+db.sqlite3
+/dashboard/utils.py
