@@ -477,3 +477,6 @@ a {
     stroke-dasharray: 0 300;
     transition: 0.5s;
 }
+.sensor .indicator-graphic .effect.critical {
+   stroke: #FF5871;
+}
